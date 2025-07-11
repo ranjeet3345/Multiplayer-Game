@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  Home Page
+{% endblock title %}
+
+{% block extra_css %}
+  
+  <style>
+    .livepool-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 40px;
+    }
+
+    .country-box {
+      background: #f9f9f9;
+      border-radius: 12px;
+      text-align: center;
+      padding: 20px;
+      cursor: pointer;
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.4s ease;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    .country-box.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .country-box.hovered {
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      transform: scale(1.03);
+    }
+
+    .country-flag {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .country-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 20px;
+      color: #444;
+    }
+  </style>
+{% endblock extra_css %}
+
+{% block bodycontent %}
+  <h2>🌐 LivePool</h2>
+
+  <div class="livepool-container">
+    <div class="country-box" data-country="India">
+      <div class="country-flag">🇮🇳</div>
+      <div class="country-name">India</div>
+    </div>
+    <div class="country-box" data-country="USA">
+      <div class="country-flag">🇺🇸</div>
+      <div class="country-name">USA</div>
+    </div>
+    <div class="country-box" data-country="UK">
+      <div class="country-flag">🇬🇧</div>
+      <div class="country-name">UK</div>
+    </div>
+    <div class="country-box" data-country="France">
+      <div class="country-flag">🇫🇷</div>
+      <div class="country-name">France</div>
+    </div>
+    <div class="country-box" data-country="Japan">
+      <div class="country-flag">🇯🇵</div>
+      <div class="country-name">Japan</div>
+    </div>
+    <div class="country-box" data-country="Brazil">
+      <div class="country-flag">🇧🇷</div>
+      <div class="country-name">Brazil</div>
+    </div>
+  </div>
+{% endblock bodycontent %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const countryBoxes = document.querySelectorAll('.country-box');
+
+    countryBoxes.forEach((box, index) => {
+      setTimeout(() => {
+        box.classList.add('visible');
+      }, index * 100);
+    });
+
+    countryBoxes.forEach(box => {
+      const country = box.dataset.country;
+
+      box.addEventListener('mouseenter', () => {
+        box.classList.add('hovered');
+        console.log(`Hovered on ${country}`);
+      });
+
+      box.addEventListener('mouseleave', () => {
+        box.classList.remove('hovered');
+      });
+
+      box.addEventListener('click', () => {
+        window.location.href = `/livepool/${country.toLowerCase()}/`;
+      });
+    });
+  });
+</script>
+{% endblock extra_js %}
+

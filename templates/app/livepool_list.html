@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Live Pool - {{ country }}
+{% endblock title %}
+
+{% block extra_css %}
+<style>
+  .container {
+    max-width: 800px;
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  .user-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    margin-top: 30px;
+  }
+
+  .user-card {
+    background: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .user-card.ready {
+    border: 2px solid #4CAF50;
+    background-color: #e7fbe7;
+  }
+
+  .user-card:hover {
+    background-color: #e0e0e0;
+  }
+
+  .you-label {
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #007bff;
+  }
+
+  #invite-box {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #ff9800;
+  }
+
+  #readyBtn {
+    background: #4CAF50;
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  #readyBtn:hover {
+    background: #45a049;
+  }
+</style>
+{% endblock extra_css %}
+
+{% block bodycontent %}
+<div class="container">
+  <h2>🌐 Live Pool: {{ country }}</h2>
+  <button id="readyBtn">Toggle Ready</button>
+
+  <div class="user-list" id="userList">
+    <!-- users will be rendered here -->
+  </div>
+
+  <div id="invite-box"></div>
+</div>
+{% endblock bodycontent %}
+
+{% block extra_js %}
+
+
+
+
+    <script>
+  const poolName = "{{ country }}";
+  const userList = document.getElementById("userList");
+  const readyBtn = document.getElementById("readyBtn");
+  const inviteBox = document.getElementById("invite-box");
+  let currentUsername = "{{ request.user.username }}";
+
+  const wsUrl = `ws://${window.location.host}/ws/livepool/${poolName}/`;
+  const socket = new WebSocket(wsUrl);
+
+  socket.onopen = () => {
+    console.log("✅ WebSocket connected.");
+  };
+
+  socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    if (data.type === "user_list") {
+      userList.innerHTML = "";
+      data.users.forEach(user => {
+        const div = document.createElement("div");
+        div.classList.add("user-card");
+        if (user.is_ready) {
+          div.classList.add("ready");
+        }
+
+        div.innerHTML = `
+          <div><strong>${user.username}</strong></div>
+          ${user.username === currentUsername ? '<div class="you-label">(You)</div>' : ''}
+        `;
+
+        // Invite on click
+        if (user.username !== currentUsername) {
+          div.addEventListener("click", () => {
+            socket.send(JSON.stringify({
+              action: "send_invite",
+              target: user.username
+            }));
+          });
+        }
+
+        userList.appendChild(div);
+      });
+    }
+
+    if (data.type === "invite") {
+      const fromUser = data.from;
+      const accept = confirm(`${fromUser} invited you to join a game. Accept?`);
+      socket.send(JSON.stringify({
+        action: "invite_response",
+        to_user: fromUser,
+        response: accept ? "accepted" : "rejected"
+      }));
+    }
+
+    if (data.type === "invite_response") {
+      inviteBox.innerText = `${data.from} has ${data.response} your invite.`;
+      setTimeout(() => inviteBox.innerText = "", 5000);
+
+      // ✅ Redirect if game accepted
+      if (data.response === "accepted" && data.room_id) {
+        window.location.href = `/game/${data.room_id}/`;  // 👈 Adjust this URL if your game URL pattern is different
+      }
+    }
+  };
+
+  socket.onclose = () => {
+    console.warn("❌ WebSocket closed.");
+  };
+
+  readyBtn.addEventListener("click", () => {
+    socket.send(JSON.stringify({
+      action: "toggle_ready"
+    }));
+  }); 
+</script>
+
+
+
+
+
+
+
+{% endblock extra_js %}

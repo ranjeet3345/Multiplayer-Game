@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Play | {{room_code}}</title>
+
+
+</head>
+
+<style>
+    @import url("https://fonts.googleapis.com/css?family=Catamaran:200");
+    @import url("https://fonts.googleapis.com/css?family=Quicksand");
+
+    /* General Styles */
+
+    * {
+        /*   box-sizing: border-box; */
+    }
+
+    body {
+        background-color: #eee;
+        color: #333;
+        font-family: "Catamaran", sans-serif;
+    }
+
+    .full-page {
+        box-sizing: border-box;
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .flex-row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .flex-column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .wrap {
+        flex-wrap: wrap;
+    }
+
+    /* Game Styles */
+
+    .game {
+        flex: 1 1 auto;
+        max-width: 400px;
+        border: 1px solid #ccc;
+    }
+
+    .game>div {
+        flex: 1 1 auto;
+        font-size: 1.1em;
+    }
+
+    /* Options */
+
+    #game_options {
+        flex: 1 1 auto;
+    }
+
+    #game_options>div {
+        flex: 1 1 auto;
+        min-width: 150px;
+    }
+
+    #player1type,
+    #player2type {
+        background-color: #bbb;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+
+    #player1type>div,
+    #player2type>div {
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    .activetype {
+        background-color: #dbdbdb;
+    }
+
+    #player1type>div:hover,
+    #player2type>div:hover {
+        background-color: #fff;
+    }
+
+    .playername {
+        flex: 1 1 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ddd;
+        padding: 5px;
+        -webkit-transition: all 0.3s;
+        -moz-transition: all 0.3s;
+        transition: all 0.3s;
+    }
+
+    .playername:focus {
+        outline: none;
+        background-color: #ccc;
+    }
+
+    .options {
+        flex: 1 1 100%;
+    }
+
+    .options>div {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ailevel {
+        font-size: 0.9em;
+        flex: 1 1 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .ailevel>div {
+        padding: 4px;
+        color: #eee;
+        flex: 1 1 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .easyai {
+        background-color: #773;
+    }
+
+    .averageai {
+        background-color: #753;
+    }
+
+    .expertai {
+        background-color: #b43;
+    }
+
+    .startReset {
+        width: 100%;
+        cursor: pointer;
+        color: #eee;
+    }
+
+    .startReset>div {
+        padding: 7px;
+        font-size: 1.3em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #start {
+        flex: 3 1 auto;
+        min-width: 234px;
+        background-color: #575;
+    }
+
+    #start:hover {
+        background-color: #595;
+    }
+
+    #start:active {
+        background-color: #484;
+    }
+
+    .startactive {
+        background-color: #494;
+    }
+
+    #reset {
+        flex: 1 1 auto;
+        background-color: #655;
+    }
+
+    #reset:hover {
+        background-color: #855;
+    }
+
+    #reset:active {
+        background-color: #844;
+    }
+
+    .scoreboard {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f0f0f0;
+    }
+
+    .scoreboard>div {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px;
+    }
+
+    .activeplayer {
+        background-color: #248;
+    }
+
+    .boardcontainer {
+        width: 100%;
+        padding-top: 100%;
+        /* 1:1 Aspect Ratio */
+        position: relative;
+        /* If you want text inside of it */
+    }
+
+    .board {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-column-gap: 2px;
+        grid-row-gap: 2px;
+    }
+
+    .space {
+        background-color: #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Quicksand";
+        font-weight: 300;
+        font-size: 3em;
+    }
+
+    .space:hover {
+        background-color: #bbb;
+    }
+
+    .space:active {
+        background-color: #aaa;
+    }
+
+    .highlightVictory {
+        background-color: #388;
+    }
+
+    .tieboard {
+        background-color: #665;
+    }
+</style>
+
+<body class="bg-dark">
+
+    <div class="full-page" id="full-page">
+
+        <div class="game flex-column">
+            <div class="scoreboard">
+                <div class="player1">Player 1: 0</div>
+                <div class="player2">Player 2: 0</div>
+            </div>
+            <div class="boardcontainer">
+                <div class="board">
+                    <div data-cell-index="0" class="space"></div>
+                    <div data-cell-index="1" class="space"></div>
+                    <div data-cell-index="2" class="space"></div>
+                    <div data-cell-index="3" class="space"></div>
+                    <div data-cell-index="4" class="space"></div>
+                    <div data-cell-index="5" class="space"></div>
+                    <div data-cell-index="6" class="space"></div>
+                    <div data-cell-index="7" class="space"></div>
+                    <div data-cell-index="8" class="space"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script>
+    const room_code = "{{ room_code }}";
+    const username = "{{ username }}";
+
+    let playerSymbol = null; // "X" or "O"
+    let myTurn = false;
+    let gameOver = false;
+
+    const socket = new WebSocket(`ws://${window.location.host}/ws/game/${room_code}/`);
+
+    const gameState = Array(9).fill("");
+    const boardCells = document.querySelectorAll('.space');
+
+    boardCells.forEach((cell) => {
+        cell.addEventListener("click", function () {
+            if (gameOver) return;
+
+            const index = this.getAttribute('data-cell-index');
+
+            if (!myTurn) {
+                alert("Not your turn!");
+                return;
+            }
+
+            if (gameState[index] !== "") {
+                alert("You cannot fill this space");
+                return;
+            }
+
+            gameState[index] = playerSymbol;
+            this.innerText = playerSymbol;
+
+            myTurn = false;
+
+            const data = {
+                type: "running",
+                player: username,
+                symbol: playerSymbol,
+                index: parseInt(index)
+            };
+            socket.send(JSON.stringify({ data }));
+
+            if (checkWon(playerSymbol)) {
+                socket.send(JSON.stringify({
+                    data: {
+                        type: "end",
+                        player: username,
+                        symbol: playerSymbol
+                    }
+                }));
+                gameOver = true;
+                swal("Good job!", "You won!", "success");
+            } else if (checkDraw()) {
+                socket.send(JSON.stringify({ data: { type: "over" } }));
+                gameOver = true;
+                swal("It's a draw!", "Game ended with no winner", "info");
+            }
+        });
+    });
+
+    function checkWon(symbol) {
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6],
+        ];
+
+        return winPatterns.some(pattern =>
+            pattern.every(index => gameState[index] === symbol)
+        );
+    }
+
+    function checkDraw() {
+        return gameState.every(cell => cell !== "");
+    }
+
+    function setOpponentMove(index, symbol) {
+        gameState[index] = symbol;
+        boardCells[index].innerText = symbol;
+    }
+
+    socket.onopen = () => {
+        console.log("Socket connected");
+    };
+
+    socket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        console.log("Received:", data);
+
+        if (data.type === "player_join") {
+            swal("Info", data.message, "info");
+        }
+
+        if (data.type === "game_data") {
+            const payload = data.payload;
+
+            if (payload.type === "assign") {
+                playerSymbol = payload.symbol;
+                myTurn = payload.turn;
+                swal("Assigned", `You are ${playerSymbol}`, "info");
+            }
+
+            else if (payload.type === "running" && payload.player !== username) {
+                setOpponentMove(payload.index, payload.symbol);
+                myTurn = true;
+            }
+
+            else if (payload.type === "end" && payload.player !== username) {
+                gameOver = true;
+                swal("Sorry!", "You lost!", "error");
+            }
+
+            else if (payload.type === "over") {
+                gameOver = true;
+                swal("Game Over", "No one won!", "warning");
+            }
+        }
+    };
+
+    socket.onclose = () => {
+        console.log("Socket closed");
+    };
+</script>
+
+
+
+
+
+
+</body>
+
+</html>

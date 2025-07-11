@@ -57,7 +57,7 @@ ROOT_URLCONF = 'MultiplayerGame.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,12 +117,27 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "/static/"
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Optional – if you’ll add custom static files
-STATICFILES_DIRS = [BASE_DIR / "static"]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR/'media'
+
+
+
+# settings.py
+
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Folder where you keep base.css, base.js etc.
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"  # For collectstatic (prod only)
 
 
 # Default primary key field type
@@ -138,3 +153,8 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+# settings.py
+LOGIN_REDIRECT_URL = 'profile'
+LOGOUT_REDIRECT_URL = 'login'

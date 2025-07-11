@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Pool</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f6f8;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #0077cc;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .user-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9f9f9;
+      margin-bottom: 15px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .user-card:hover {
+      background: #eef4ff;
+    }
+
+    .user-info {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .status {
+      margin-left: 10px;
+      font-size: 16px;
+    }
+
+    .status.ready {
+      color: green;
+    }
+
+    .status.not-ready {
+      color: red;
+    }
+
+    .play-btn {
+      padding: 8px 16px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .play-btn:hover {
+      background: #005fa3;
+    }
+
+    .self-label {
+      font-style: italic;
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎮 Live Pool</h2>
+    <ul id="userList"></ul>
+  </div>
+
+  <script>
+    const username = prompt("Enter your username:");
+    const poolName = "testpool";
+    const socket = new WebSocket(`ws://${window.location.host}/ws/livepool/${poolName}/`);
+
+    socket.onopen = () => {
+      console.log("WebSocket Connected");
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === "user_list") {
+        const list = document.getElementById("userList");
+        list.innerHTML = "";
+        data.users.forEach(user => {
+          const li = document.createElement("li");
+          li.className = "user-card";
+
+          const infoDiv = document.createElement("div");
+          infoDiv.className = "user-info";
+          infoDiv.innerHTML = `${user.username} <span class="status ${user.is_ready ? 'ready' : 'not-ready'}">${user.is_ready ? "✅ Ready" : "❌ Not Ready"}</span>`;
+
+          li.appendChild(infoDiv);
+
+          if (user.username === username) {
+            const selfTag = document.createElement("div");
+            selfTag.className = "self-label";
+            selfTag.textContent = "(You)";
+            li.appendChild(selfTag);
+          } else {
+            const btn = document.createElement("button");
+            btn.className = "play-btn";
+            btn.textContent = "Request to Play";
+            btn.onclick = () => sendInvite(user.username);
+            li.appendChild(btn);
+          }
+
+          list.appendChild(li);
+        });
+      }
+
+      else if (data.type === "invite") {
+        if (confirm(`🎯 Play request from "${data.from}". Accept?`)) {
+          sendInviteResponse(data.from, "accepted");
+        } else {
+          sendInviteResponse(data.from, "rejected");
+        }
+      }
+
+      else if (data.type === "invite_response") {
+        alert(`✅ "${data.from}" has ${data.response} your request.`);
+        // Redirect to game if accepted
+      }
+    };
+
+    function sendInvite(target) {
+      socket.send(JSON.stringify({
+        action: "send_invite",
+        target: target
+      }));
+    }
+
+    function sendInviteResponse(toUser, response) {
+      socket.send(JSON.stringify({
+        action: "invite_response",
+        to_user: toUser,
+        response: response
+      }));
+    }
+  </script>
+</body>
+</html>
